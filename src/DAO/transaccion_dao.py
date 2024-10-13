@@ -6,7 +6,7 @@ class transaccion_dao(ABC):
         pass
     
     @abstractmethod
-    def get_by_inversor(self, inversor_id: int):
+    def get_by_inversor(self, user_id: int):
         pass
     
     @abstractmethod
