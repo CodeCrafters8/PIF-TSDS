@@ -1,6 +1,6 @@
 import mysql.connector
 
-class Conexion:
+class Conexionbd:
     def __init__(self):
         """Inicializa la clase de conexión a MySQL sin una conexión activa."""
         self.conexion = None
@@ -8,7 +8,7 @@ class Conexion:
 
     def ConexionBaseDeDatos(self, user, password):
         """
-        Conecta a MySQL y crea la base de datos 'argbroker' si no existe.
+        Conecta a MySQL y crea la base de datos 'Broker_ISPC_cba' si no existe.
 
         :param user: Nombre de usuario para la conexión a MySQL.
         :param password: Contraseña para la conexión a MySQL.
@@ -23,7 +23,17 @@ class Conexion:
             )
             
             if self.conexion.is_connected():
-                print("¡Conectado exitosamente a Base de datos 'argbroker'!")
+                print("¡Conectado exitosamente a MySQL!")
+
+                # Crear la base de datos si no existe
+                self.cursor = self.conexion.cursor()
+                self.cursor.execute("CREATE DATABASE IF NOT EXISTS Broker_ISPC_cba;")
+                print("Base de datos 'Broker_ISPC_cba' creada o ya existe.")
+
+                # Conectar a la base de datos específica
+                self.conexion.database = 'Broker_ISPC_cba'  # Selecciona la base de datos
+                print("Conectado a la base de datos 'Broker_ISPC_cba'.")
+
         except mysql.connector.Error as e:
             print(f"Error al conectar con MySQL: {e}")
 
@@ -36,6 +46,7 @@ class Conexion:
         if self.conexion and self.conexion.is_connected():
             self.conexion.close()  # Cierra la conexión
             print("Conexión cerrada.")
+
 
 # # Ejemplo de uso
 # if __name__ == "__main__":
