@@ -33,15 +33,25 @@ CREATE TABLE IF NOT EXISTS sector (
     PRIMARY KEY (id_sector)
 );
 
+CREATE TABLE IF NOT EXISTS  empresa (
+id_empresa INT AUTO_INCREMENT,
+nombre VARCHAR(30),
+cuit VARCHAR(11),
+dommicilio VARCHAR(50),
+sector_id INT NOT NULL,
+	PRIMARY KEY (id_empresa),
+CONSTRAINT fk_sector FOREIGN KEY (sector_id)
+	REFERENCES sector(id_sector) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS acciones (
     id_accion INT AUTO_INCREMENT,
     ticker VARCHAR(10) NOT NULL UNIQUE,
     nombre VARCHAR(100) NOT NULL,
-    empresa VARCHAR(100) NOT NULL,
-    sector_id INT NOT NULL, 
-    PRIMARY KEY (id_accion),
-    CONSTRAINT fk_sector FOREIGN KEY (sector_id)
-        REFERENCES sector(id_sector) ON DELETE CASCADE
+    empresa_id INT NOT NULL,
+        PRIMARY KEY (id_accion),
+    CONSTRAINT fk_empresa FOREIGN KEY (empresa_id)
+        REFERENCES empresa(id_empresa) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS cotizacion (
@@ -83,6 +93,7 @@ CREATE TABLE IF NOT EXISTS operacion (
 CREATE TABLE IF NOT EXISTS portafolio (
     id_portafolio INT AUTO_INCREMENT,
     saldo_cuenta DECIMAL(10, 2) NOT NULL,
+    total_invertido DECIMAL (10,2) NOT NULL,
     id_inversor INT NOT NULL,
     PRIMARY KEY (id_portafolio),
     CONSTRAINT fk_portafolio_inversor FOREIGN KEY (id_inversor)
