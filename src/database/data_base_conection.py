@@ -50,7 +50,7 @@ class Conexionbd:
 
 # # Ejemplo de uso
 # if __name__ == "__main__":
-#     conexion = Conexion()
+#     conexion = Conexionbd()
     
 #     # Aquí se pasan el usuario y la contraseña como argumentos
 #     conexion.ConexionBaseDeDatos(user='root', password='admin')  # Llama al método para crear la base de datos
