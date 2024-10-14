@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 
-class transaccion_dao(ABC):
+class Transaccion_dao(ABC):
     @abstractmethod
-    def get(self, id: int):
+    def get(self, id_operacion: int):
         pass
     
     @abstractmethod
@@ -20,4 +20,7 @@ class transaccion_dao(ABC):
     @abstractmethod
     def delete( self, id: int):
         pass
-    
+
+    @abstractmethod
+    def get_stock_quantity_in_portfolio(self, inversor_id, accion_id):
+        pass
