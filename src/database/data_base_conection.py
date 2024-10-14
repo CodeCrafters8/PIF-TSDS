@@ -48,12 +48,12 @@ class Conexionbd:
             print("Conexión cerrada.")
 
 
-# # Ejemplo de uso
-# if __name__ == "__main__":
-#     conexion = Conexionbd()
+# Ejemplo de uso
+if __name__ == "__main__":
+    conexion = Conexionbd()
     
-#     # Aquí se pasan el usuario y la contraseña como argumentos
-#     conexion.ConexionBaseDeDatos(user='root', password='admin')  # Llama al método para crear la base de datos
+    # Aquí se pasan el usuario y la contraseña como argumentos
+    conexion.ConexionBaseDeDatos(user='root', password='admin')  # Llama al método para crear la base de datos
 
-#     # Cierra la conexión cuando termines
-#     conexion.cerrar_conexion()
+    # Cierra la conexión cuando termines
+    conexion.cerrar_conexion()
