@@ -1,59 +1,47 @@
+import os
+import configparser
 import mysql.connector
 
-class Conexionbd:
+class ConexionDB:
     def __init__(self):
-        """Inicializa la clase de conexión a MySQL sin una conexión activa."""
+        self.config = self.leer_configuracion()
         self.conexion = None
         self.cursor = None
 
-    def ConexionBaseDeDatos(self, user, password):
-        """
-        Conecta a MySQL y crea la base de datos 'Broker_ISPC_cba' si no existe.
+    def leer_configuracion(self, archivo_config="config.ini"):
+        ruta_actual = os.path.dirname(__file__)
+        ruta_config = os.path.join(ruta_actual, archivo_config)
 
-        :param user: Nombre de usuario para la conexión a MySQL.
-        :param password: Contraseña para la conexión a MySQL.
-        """
+        config = configparser.ConfigParser()
+        config.read(ruta_config)
+
+        return config['mysql']
+
+    def conectar(self):
         try:
-            # Conexión a MySQL sin especificar la base de datos
-            self.conexion = mysql.connector.connect(
-                user=user,
-                password=password,
-                host='localhost',
-                port='3306'
-            )
-            
-            if self.conexion.is_connected():
-                print("¡Conectado exitosamente a MySQL!")
-
-                # Crear la base de datos si no existe
-                self.cursor = self.conexion.cursor()
-                self.cursor.execute("CREATE DATABASE IF NOT EXISTS Broker_ISPC_cba;")
-                print("Base de datos 'Broker_ISPC_cba' creada o ya existe.")
-
-                # Conectar a la base de datos específica
-                self.conexion.database = 'Broker_ISPC_cba'  # Selecciona la base de datos
-                print("Conectado a la base de datos 'Broker_ISPC_cba'.")
-
-        except mysql.connector.Error as e:
-            print(f"Error al conectar con MySQL: {e}")
+            self.conexion = mysql.connector.connect(**self.config)
+            self.cursor = self.conexion.cursor()
+            print("Conexión a la base de datos establecida.")
+            return self.conexion
+        except mysql.connector.Error as error:
+            print(f"Error al conectar a la base de datos: {error}")
+            return None
 
     def cerrar_conexion(self):
-        """
-        Cierra el cursor y la conexión a la base de datos, si están abiertas.
-        """
-        if self.cursor:
-            self.cursor.close()  # Cierra el cursor
-        if self.conexion and self.conexion.is_connected():
-            self.conexion.close()  # Cierra la conexión
-            print("Conexión cerrada.")
+        if self.conexion:
+            self.cursor.close()
+            self.conexion.close()
+            print("Conexión a la base de datos cerrada.")
 
-
-# Ejemplo de uso
+# Ejemplo de uso:
 if __name__ == "__main__":
-    conexion = Conexionbd()
-    
-    # Aquí se pasan el usuario y la contraseña como argumentos
-    conexion.ConexionBaseDeDatos(user='root', password='admin')  # Llama al método para crear la base de datos
-
-    # Cierra la conexión cuando termines
-    conexion.cerrar_conexion()
+    db = ConexionDB()
+    conexion = db.conectar()
+    if conexion:
+        cursor = conexion.cursor()
+        cursor.execute("SELECT * FROM inversor")
+        resultados = cursor.fetchall()
+        print(resultados)
+        db.cerrar_conexion()
+    else:
+        print("Error al establecer la conexión")
