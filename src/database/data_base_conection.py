@@ -33,15 +33,15 @@ class ConexionDB:
             self.conexion.close()
             print("Conexión a la base de datos cerrada.")
 
-# Ejemplo de uso:
-if __name__ == "__main__":
-    db = ConexionDB()
-    conexion = db.conectar()
-    if conexion:
-        cursor = conexion.cursor()
-        cursor.execute("SELECT * FROM inversor")
-        resultados = cursor.fetchall()
-        print(resultados)
-        db.cerrar_conexion()
-    else:
-        print("Error al establecer la conexión")
+# # Ejemplo de uso:
+# if __name__ == "__main__":
+#     db = ConexionDB()
+#     conexion = db.conectar()
+#     if conexion:
+#         cursor = conexion.cursor()
+#         cursor.execute("SELECT * FROM inversor")
+#         resultados = cursor.fetchall()
+#         print(resultados)
+#         db.cerrar_conexion()
+#     else:
+#         print("Error al establecer la conexión")
