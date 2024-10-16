@@ -2,14 +2,14 @@ import re
 from database.data_base_conection import ConexionDB
 from DAO.user_dao_imp import UserDAOImpl
 from DAO.perfil_Inversor_dao_imp import PerfilInversorDAOImpl
-
+from model.user import User  # Asegúrate de importar la clase User
 
 class UserService:
     def __init__(self):
-        self.db = ConexionDB()
-        self.user_dao = UserDAOImpl(self.db)
-        self.perfil_inversor_dao = PerfilInversorDAOImpl(self.db)
-
+        self.db = ConexionDB()  # Conexión a la base de datos
+        self.user_dao = UserDAOImpl(self.db)  # Pasar la conexión a UserDAOImpl
+        self.perfil_inversor_dao = PerfilInversorDAOImpl(self.db)  # Pasar la conexión a PerfilInversorDAOImpl
+        
     def registrar_inversor(self, nombre, apellido, cuil, email, contrasena, saldo_inicial, tipo_perfil):
         if not self.validar_email(email):
             print("Email inválido.")
@@ -18,12 +18,23 @@ class UserService:
             print("Cuil inválido.")
             return False
         
-        return self.user_dao.registrar_usuario(nombre, apellido, cuil, email, contrasena, saldo_inicial, tipo_perfil)
+        # Obtiene el ID del perfil inversor
+        perfil_inversor = self.perfil_inversor_dao.obtener_perfil_por_tipo(tipo_perfil)  # Debes implementar este método
+        if perfil_inversor is None:
+            print("Tipo de perfil no válido.")
+            return False
+        
+        id_perfil_inversor = perfil_inversor['id']  # Asegúrate de que esta línea coincida con tu estructura de datos
+        
+        # Crea una instancia de User incluyendo id_perfil_inversor
+        usuario = User(id_perfil_inversor, nombre, apellido, email, contrasena, cuil, saldo_inicial)
+        return self.user_dao.insertar_usuario(usuario)
+    
 
     def iniciar_sesion(self, email, contrasena):
         usuario = self.user_dao.obtener_usuario_por_email(email)
-        if usuario and usuario['contrasena'] == contrasena:
-            print(f"Bienvenido, {usuario['Nombre']} {usuario['Apellido']}!")
+        if usuario and usuario.contrasena == contrasena:
+            print(f"Bienvenido, {usuario.nombre} {usuario.apellido}!")
             return True
         else:
             print("Email o contraseña incorrectos.")
@@ -33,7 +44,7 @@ class UserService:
         usuario = self.user_dao.obtener_usuario_por_email(email)
         if usuario:
             nueva_contrasena = self.generar_contrasena_temporal()
-            self.user_dao.actualizar_contrasena(usuario['ID_Usuario'], nueva_contrasena)
+            self.user_dao.actualizar_contrasena(usuario.id_usuario, nueva_contrasena)
             print(f"Nueva contraseña temporal generada: {nueva_contrasena}")
         else:
             print("No se encontró un usuario con ese email.")

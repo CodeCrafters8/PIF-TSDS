@@ -1,9 +1,3 @@
-# from DAO.user_dao_imp import UserDAOImpl
-# from DAO.perfil_Inversor_dao_imp import PerfilInversorDAOImpl
-# from model.user import User
-# from model.perfil_Inversor import PerfilInversor
-
-
 from service.user_service import UserService
 
 def mostrar_menu():

@@ -4,8 +4,8 @@ from database.data_base_conection import ConexionDB
 from model.user import User
 
 class UserDAOImpl(UserDAO):
-    def __init__(self):
-        self.db = ConexionDB()
+    def __init__(self, db: ConexionDB):  # Recibe la conexión a la base de datos
+        self.db = db
 
     def obtener_todos(self):
         try:
