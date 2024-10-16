@@ -18,32 +18,44 @@ class ConexionDB:
         return config['mysql']
 
     def conectar(self):
+        if self.conexion is None:
+            try:
+                self.conexion = mysql.connector.connect(**self.config)
+                self.cursor = self.conexion.cursor()
+                print("Conexión a la base de datos establecida.")
+            except mysql.connector.Error as error:
+                print(f"Error al conectar a la base de datos: {error}")
+                return None
+        return self.conexion
+
+    def ejecutar_query(self, query, params=None):
+        self.conectar()
         try:
-            self.conexion = mysql.connector.connect(**self.config)
-            self.cursor = self.conexion.cursor()
-            print("Conexión a la base de datos establecida.")
-            return self.conexion
+            self.cursor.execute(query, params)
+            self.conexion.commit()
+            return self.cursor
         except mysql.connector.Error as error:
-            print(f"Error al conectar a la base de datos: {error}")
+            print(f"Error al ejecutar la consulta: {error}")
             return None
 
     def cerrar_conexion(self):
         if self.conexion:
             self.cursor.close()
             self.conexion.close()
+            self.conexion = None
             print("Conexión a la base de datos cerrada.")
 
-#Ejemplo de uso:
+# Ejemplo de uso:
 if __name__ == "__main__":
     db = ConexionDB()
     conexion = db.conectar()
+    
     if conexion:
-        cursor = conexion.cursor()
         # Modificar la consulta según la nueva tabla Usuario
-        cursor.execute("SELECT * FROM Usuario")
+        cursor = db.ejecutar_query("SELECT * FROM Usuario")
         resultados = cursor.fetchall()
+        
         for fila in resultados:
             print(fila)
-        db.cerrar_conexion()
-    else:
-        print("Error al establecer la conexión")
+
+    db.cerrar_conexion()
