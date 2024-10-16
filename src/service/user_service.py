@@ -10,44 +10,49 @@ class UserService:
         self.user_dao = UserDAOImpl(self.db)  # Pasar la conexión a UserDAOImpl
         self.perfil_inversor_dao = PerfilInversorDAOImpl(self.db)  # Pasar la conexión a PerfilInversorDAOImpl
         
-    def registrar_inversor(self, nombre, apellido, cuil, email, contrasena, saldo_inicial, tipo_perfil):
-        if not self.validar_email(email):
-            print("Email inválido.")
-            return False
-        if not self.validar_cuil(cuil):
-            print("Cuil inválido.")
-            return False
-        
-        # Obtiene el ID del perfil inversor
-        perfil_inversor = self.perfil_inversor_dao.obtener_perfil_por_tipo(tipo_perfil)  # Debes implementar este método
-        if perfil_inversor is None:
-            print("Tipo de perfil no válido.")
-            return False
-        
-        id_perfil_inversor = perfil_inversor['id']  # Asegúrate de que esta línea coincida con tu estructura de datos
-        
-        # Crea una instancia de User incluyendo id_perfil_inversor
-        usuario = User(id_perfil_inversor, nombre, apellido, email, contrasena, cuil, saldo_inicial)
-        return self.user_dao.insertar_usuario(usuario)
-    
 
+    def registrar_inversor(self, nombre, apellido, cuil, email, contrasena, saldo_inicial, tipo_perfil):
+        try:
+            # Verificar si el email ya existe
+            if self.user_dao.existe_email(email):
+                print("El email ya está registrado. Intente con otro.")
+                return False  # O lanzar una excepción según tu preferencia
+            
+            # Obtiene el Id del perfil directamente
+            IdPerfilInversor = self.perfil_inversor_dao.obtener_perfil(tipo_perfil)
+            
+            if IdPerfilInversor is not None:  # Verifica si se encontró el perfil
+                # Asegúrate de que saldo_inicial sea de tipo Decimal
+                nuevo_usuario = User(None, nombre, apellido, email, contrasena, cuil, saldo_inicial, IdPerfilInversor)
+                self.user_dao.insertar_usuario(nuevo_usuario)
+                print("Registro exitoso.")
+                return True
+            else:
+                print("Tipo de perfil no encontrado.")
+                return False
+        except Exception as e:
+            print(f"Error en el registro: {e}")
+            return False
+       
+    
     def iniciar_sesion(self, email, contrasena):
         usuario = self.user_dao.obtener_usuario_por_email(email)
-        if usuario and usuario.contrasena == contrasena:
-            print(f"Bienvenido, {usuario.nombre} {usuario.apellido}!")
-            return True
+        if usuario and usuario.contrasena == contrasena:  # Asegúrate de que la comparación de contraseñas sea segura
+            print("Inicio de sesión exitoso.")
+            return usuario
         else:
             print("Email o contraseña incorrectos.")
-            return False
+            return None
+    
 
     def recuperar_contrasena(self, email):
         usuario = self.user_dao.obtener_usuario_por_email(email)
         if usuario:
-            nueva_contrasena = self.generar_contrasena_temporal()
+            nueva_contrasena = input("Ingrese su nueva contraseña: ")
             self.user_dao.actualizar_contrasena(usuario.id_usuario, nueva_contrasena)
-            print(f"Nueva contraseña temporal generada: {nueva_contrasena}")
+            print("Contraseña actualizada exitosamente.")
         else:
-            print("No se encontró un usuario con ese email.")
+            print("Error: Usuario no encontrado.")
 
     @staticmethod
     def validar_email(email):

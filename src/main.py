@@ -20,7 +20,7 @@ def main():
             cuil = input("Ingrese su CUIL: ")
             email = input("Ingrese su email: ")
             contrasena = input("Ingrese su contraseña: ")
-            saldo_inicial = 1000000.00
+            saldo_inicial = 1000000.00  
             tipo_perfil = input("Ingrese tipo de perfil (conservador, medio, agresivo): ")
 
             if service.registrar_inversor(nombre, apellido, cuil, email, contrasena, saldo_inicial, tipo_perfil):
