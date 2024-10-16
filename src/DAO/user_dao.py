@@ -1,19 +1,23 @@
 from abc import ABC, abstractmethod
+from model.user import User
 
-class user_dao(ABC):
+class UserDAO(ABC):
     @abstractmethod
-    def get(self, id: int):
+    def obtener_todos(self):
         pass
-    
+
     @abstractmethod
-    def get_by_email(self, email: str):
+    def insertar_usuario(self, usuario: Usuario):
         pass
-    
+
     @abstractmethod
-    def update(self, user):
+    def obtener_por_id(self, id_usuario: int):
         pass
-    
-    @abstractmethod 
-    def delete(self, id: int):
+
+    @abstractmethod
+    def actualizar_usuario(self, usuario: Usuario):
         pass
-    
+
+    @abstractmethod
+    def eliminar_usuario(self, id_usuario: int):
+        pass
