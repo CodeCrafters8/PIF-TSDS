@@ -7,7 +7,7 @@ class UserDAO(ABC):
         pass
 
     @abstractmethod
-    def insertar_usuario(self, usuario: Usuario):
+    def insertar_usuario(self, usuario: User):
         pass
 
     @abstractmethod
@@ -15,7 +15,7 @@ class UserDAO(ABC):
         pass
 
     @abstractmethod
-    def actualizar_usuario(self, usuario: Usuario):
+    def actualizar_usuario(self, usuario: User):
         pass
 
     @abstractmethod

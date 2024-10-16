@@ -13,12 +13,12 @@ class UserDAOImpl(UserDAO):
             cursor = conexion.cursor()
             cursor.execute("SELECT * FROM Usuario")
             resultados = cursor.fetchall()
-            usuarios = [Usuario(*fila) for fila in resultados]
+            usuarios = [User(*fila) for fila in resultados]
             return usuarios
         finally:
             self.db.cerrar_conexion()
 
-    def insertar_usuario(self, usuario: Usuario):
+    def insertar_usuario(self, usuario: User):
         try:
             conexion = self.db.conectar()
             cursor = conexion.cursor()
@@ -37,12 +37,12 @@ class UserDAOImpl(UserDAO):
             cursor.execute("SELECT * FROM Usuario WHERE ID_Usuario = %s", (id_usuario,))
             resultado = cursor.fetchone()
             if resultado:
-                return Usuario(*resultado)
+                return User(*resultado)
             return None
         finally:
             self.db.cerrar_conexion()
 
-    def actualizar_usuario(self, usuario: Usuario):
+    def actualizar_usuario(self, usuario: User):
         try:
             conexion = self.db.conectar()
             cursor = conexion.cursor()

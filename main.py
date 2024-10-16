@@ -7,7 +7,7 @@ from model.perfil_Inversor import PerfilInversor
 if __name__ == "__main__":
     # Prueba con Usuario
     usuario_dao = UserDAOImpl()
-    nuevo_usuario = Usuario(None, "Juan", "Pérez", "juan.perez@gmail.com", "1234pass", "20123456789", 1000000.00, 1)
+    nuevo_usuario = User(None, "Juan", "Pérez", "juan.perez@gmail.com", "1234pass", "20123456789", 1000000.00, 1)
     usuario_dao.insertar_usuario(nuevo_usuario)
 
     usuarios = usuario_dao.obtener_todos()
