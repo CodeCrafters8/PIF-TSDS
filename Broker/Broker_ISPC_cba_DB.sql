@@ -9,11 +9,12 @@ CREATE TABLE IF NOT EXISTS perfil_inversor (
 
 CREATE TABLE IF NOT EXISTS inversor (
     id_inversor INT AUTO_INCREMENT,
-    cuit VARCHAR(11) NOT NULL,
+    cuil VARCHAR(11) NOT NULL,
     nombre VARCHAR(100) NOT NULL,
     apellido VARCHAR(100) NOT NULL,
     email VARCHAR(320) NOT NULL UNIQUE,
     contraseña VARCHAR(255) NOT NULL,
+    saldo_pesos DECIMAL (10,2) NOT NULL,
     perfil_inversor_id INT,  
     PRIMARY KEY (id_inversor),
     CONSTRAINT fk_perfil_inversor FOREIGN KEY (perfil_inversor_id) 
@@ -92,7 +93,6 @@ CREATE TABLE IF NOT EXISTS operacion (
 
 CREATE TABLE IF NOT EXISTS portafolio (
     id_portafolio INT AUTO_INCREMENT,
-    saldo_cuenta DECIMAL(10, 2) NOT NULL,
     total_invertido DECIMAL (10,2) NOT NULL,
     id_inversor INT NOT NULL,
     PRIMARY KEY (id_portafolio),
