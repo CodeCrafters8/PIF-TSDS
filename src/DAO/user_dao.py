@@ -3,7 +3,7 @@ from model.user import User
 
 class UserDAO(ABC):
     @abstractmethod
-    def obtener_todos(self):
+    def obtener_todos(self) -> list:
         pass
 
     @abstractmethod
@@ -11,7 +11,19 @@ class UserDAO(ABC):
         pass
 
     @abstractmethod
-    def obtener_por_id(self, id_usuario: int):
+    def existe_email(self, email: str) -> bool:
+        pass
+
+    @abstractmethod
+    def obtener_usuario_por_email(self, email: str) -> User:
+        pass
+
+    @abstractmethod
+    def actualizar_contraseña(self, id_inversor: int, nueva_contraseña: str):
+        pass
+
+    @abstractmethod
+    def obtener_por_id(self, id_inversor: int) -> User:
         pass
 
     @abstractmethod
@@ -19,5 +31,5 @@ class UserDAO(ABC):
         pass
 
     @abstractmethod
-    def eliminar_usuario(self, id_usuario: int):
+    def eliminar_usuario(self, id_inversor: int):
         pass

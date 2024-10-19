@@ -1,61 +1,47 @@
-import os
-import configparser
 import mysql.connector
+from mysql.connector import errorcode
+import configparser
+import pathlib
 
-class ConexionDB:
-    def __init__(self):
-        self.config = self.leer_configuracion()
-        self.conexion = None
-        self.cursor = None
 
-    def leer_configuracion(self, archivo_config="config.ini"):
-        ruta_actual = os.path.dirname(__file__)
-        ruta_config = os.path.join(ruta_actual, archivo_config)
-
-        config = configparser.ConfigParser()
-        config.read(ruta_config)
-
-        return config['mysql']
-
-    def conectar(self):
-        if self.conexion is None:
-            try:
-                self.conexion = mysql.connector.connect(**self.config)
-                self.cursor = self.conexion.cursor()
-                print("Conexión a la base de datos establecida.")
-            except mysql.connector.Error as error:
-                print(f"Error al conectar a la base de datos: {error}")
-                return None
-        return self.conexion
-
-    def ejecutar_query(self, query, params=None):
-        self.conectar()
-        try:
-            self.cursor.execute(query, params)
-            self.conexion.commit()
-            return self.cursor
-        except mysql.connector.Error as error:
-            print(f"Error al ejecutar la consulta: {error}")
-            return None
-
-    def cerrar_conexion(self):
-        if self.conexion:
-            self.cursor.close()
-            self.conexion.close()
-            self.conexion = None
-            print("Conexión a la base de datos cerrada.")
-
-# Ejemplo de uso:
-if __name__ == "__main__":
-    db = ConexionDB()
-    conexion = db.conectar()
-    
-    if conexion:
-        # Modificar la consulta según la nueva tabla Usuario
-        cursor = db.ejecutar_query("SELECT * FROM Usuario")
-        resultados = cursor.fetchall()
+class DBConn:
+    def __init__(self, config_file="config.ini"):
+        self.config_file=config_file
         
-        for fila in resultados:
-            print(fila)
+        if (self.config_file!=""):
+            # Crear una instancia de ConfigParser
+            config=configparser.ConfigParser()
+            # Configurar la ruta
+            config_path = pathlib.Path(__file__).parent.absolute() /config_file
+            
+            # Leer el archivo
+            config.read(config_path)
+            
+            # Definir una variable db_config que contiene los datos de la sección [database] del archivo.
+            self.db_config=config['database']
+        
+    def get_data_base_name(self):
+         return self.db_config.get('database')   
+     
+    
+    def connect_to_mysql(self):
+        # Conectar a una base de datos MySQL Server
+        try:
+            return mysql.connector.connect(
+                user=self.db_config.get('user'),
+                password=self.db_config.get('password'),
+                host=self.db_config.get('host'),
+                database=self.get_data_base_name()  # Agrega la base de datos aquí
+                )
+        except mysql.connector.Error as err:
+            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+                raise Exception("Usuario o Password no válido")
+            elif err.errno == errorcode.ER_BAD_DB_ERROR:
+                raise Exception("La base de datos no existe.")
+            else:
+                raise err         
 
-    db.cerrar_conexion()
+
+       
+
+

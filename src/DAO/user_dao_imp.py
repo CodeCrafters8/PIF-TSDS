@@ -1,98 +1,112 @@
-
+import mysql.connector
 from DAO.user_dao import UserDAO
-from database.data_base_conection import ConexionDB
+from database.data_base_conection import DBConn
 from model.user import User
 
 class UserDAOImpl(UserDAO):
-    def __init__(self, db: ConexionDB):  # Recibe la conexión a la base de datos
-        self.db = db
+    def __init__(self, db_conn: DBConn):  # Recibe la instancia de DBConn
+        self.db_conn = db_conn  # Almacena la instancia de DBConn
+        self.db_name = db_conn.get_data_base_name()
 
-    def obtener_todos(self):
-        try:
-            conexion = self.db.conectar()
-            cursor = conexion.cursor()
-            cursor.execute("SELECT * FROM Usuario")
-            resultados = cursor.fetchall()
-            usuarios = [User(*fila) for fila in resultados]
-            return usuarios
-        finally:
-            self.db.cerrar_conexion()
+    def obtener_todos(self) -> list:
+        conn = self.db_conn.connect_to_mysql()  # Obtiene la conexión
+        with conn:  # Usa la conexión en un contexto
+            try:
+                cursor = conn.cursor()
+                query = f"SELECT * FROM {self.db_conn.get_data_base_name()}.inversor"
+                cursor.execute(query)
+                resultados = cursor.fetchall()
+                usuarios = [User(*fila) for fila in resultados]  # Crea objetos User
+                return usuarios
+            except mysql.connector.Error as err:
+                raise err
 
     def insertar_usuario(self, usuario: User):
-        try:
-            conexion = self.db.conectar()
-            cursor = conexion.cursor()
-            sql = """INSERT INTO Usuario (Nombre, Apellido, Email, Contrasena, Cuil, Saldo_Inicial, IdPerfilInversor)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)"""
-            cursor.execute(sql, (usuario.nombre, usuario.apellido, usuario.email, usuario.contrasena,
-                             usuario.cuil, usuario.saldo_inicial, usuario.IdPerfilInversor))
-            conexion.commit()
-        finally:
-            self.db.cerrar_conexion()
+        conn = self.db_conn.connect_to_mysql()  # Obtiene la conexión
+        with conn:  # Usa la conexión en un contexto
+            try:
+                cursor = conn.cursor()
+                query = f"""INSERT INTO {self.db_conn.get_data_base_name()}.inversor
+                            (cuil, nombre, apellido, email, contraseña, saldo_pesos, perfil_inversor_id) 
+                            VALUES (%s, %s, %s, %s, %s, %s, %s)"""
+                cursor.execute(query, (usuario.cuil, usuario.nombre, usuario.apellido, usuario.email, usuario.contraseña,
+                                        usuario.saldo_pesos, usuario.perfil_inversor_id))
+                conn.commit()  # Confirma los cambios
+            except mysql.connector.Error as err:
+                raise err
             
     def existe_email(self, email: str) -> bool:
-        try:
-            conexion = self.db.conectar()
-            cursor = conexion.cursor()
-            cursor.execute("SELECT COUNT(*) FROM Usuario WHERE Email = %s", (email,))
-            resultado = cursor.fetchone()
-            return resultado[0] > 0  # Retorna True si el email ya existe
-        finally:
-            self.db.cerrar_conexion()        
+        conn = self.db_conn.connect_to_mysql()  # Obtiene la conexión
+        with conn:  # Usa la conexión en un contexto
+            try:
+                cursor = conn.cursor()
+                query = f"SELECT COUNT(*) FROM {self.db_conn.get_data_base_name()}.inversor WHERE email = %s"
+                cursor.execute(query, (email,))
+                resultado = cursor.fetchone()
+                return resultado[0] > 0  # Retorna True si el email ya existe
+            except mysql.connector.Error as err:
+                raise err
+
+    def obtener_usuario_por_email(self, email: str) -> User:
+       conn = self.db_conn.connect_to_mysql()  # Obtiene la conexión
+       with conn:  # Usa la conexión en un contexto
+           try:
+               cursor = conn.cursor()
+               query = f"SELECT id_inversor, cuil, nombre, apellido, email, contraseña, saldo_pesos, perfil_inversor_id FROM {self.db_name}.inversor WHERE email = %s"
+               cursor.execute(query, (email,))
+               resultado = cursor.fetchone()
+               if resultado:
+                   return User(*resultado)  # Crea un objeto User
+               return None  # Retorna None si no se encontró
+           except mysql.connector.Error as err:
+            raise err
     
-    #Metodo necesario para el INICIO DE SESION - verifica la Existencia del mismo en la base de datos.
-    def obtener_usuario_por_email(self, email: str):
-        try:
-            conexion = self.db.conectar()
-            cursor = conexion.cursor()
-            cursor.execute("SELECT ID_Usuario, Nombre, Apellido, Email, Contrasena, Cuil, Saldo_Inicial, IdPerfilInversor FROM Usuario WHERE Email = %s", (email,))
-            resultado = cursor.fetchone()
-            if resultado:
-                return User(*resultado)  # Asegúrate de que esto coincida con la estructura de tu clase User
-            return None
-        finally:
-            self.db.cerrar_conexion()
-    
-    def actualizar_contrasena(self, id_usuario: int, nueva_contrasena: str):
-        try:
-            conexion = self.db.conectar()
-            cursor = conexion.cursor()
-            sql = """UPDATE Usuario SET Contrasena=%s WHERE ID_Usuario=%s"""
-            cursor.execute(sql, (nueva_contrasena, id_usuario))
-            conexion.commit()
-        finally:
-            self.db.cerrar_conexion()
-    
-    def obtener_por_id(self, id_usuario: int):
-        try:
-            conexion = self.db.conectar()
-            cursor = conexion.cursor()
-            cursor.execute("SELECT * FROM Usuario WHERE ID_Usuario = %s", (id_usuario,))
-            resultado = cursor.fetchone()
-            if resultado:
-                return User(*resultado)
-            return None
-        finally:
-            self.db.cerrar_conexion()
+    def actualizar_contraseña(self, id_inversor: int, nueva_contraseña: str):
+        conn = self.db_conn.connect_to_mysql()  # Obtiene la conexión
+        with conn:  # Usa la conexión en un contexto
+            try:
+                cursor = conn.cursor()
+                query = f"UPDATE {self.db_conn.get_data_base_name()}.inversor SET contraseña =%s WHERE id_inversor =%s"
+                cursor.execute(query, (nueva_contraseña, id_inversor))
+                conn.commit()  # Confirma los cambios
+            except mysql.connector.Error as err:
+                raise err
 
     def actualizar_usuario(self, usuario: User):
-        try:
-            conexion = self.db.conectar()
-            cursor = conexion.cursor()
-            sql = """UPDATE Usuario SET Nombre=%s, Apellido=%s, Email=%s, Contrasena=%s, Cuil=%s, Saldo_Inicial=%s, IdPerfilInversor=%s 
-                     WHERE ID_Usuario=%s"""
-            cursor.execute(sql, (usuario.nombre, usuario.apellido, usuario.email, usuario.contrasena,
-                                 usuario.cuil, usuario.saldo_inicial, usuario.IdPerfilInversor, usuario.id_usuario))
-            conexion.commit()
-        finally:
-            self.db.cerrar_conexion()
-            
+        conn = self.db_conn.connect_to_mysql()  # Obtiene la conexión
+        with conn:  # Usa la conexión en un contexto
+            try:
+                cursor = conn.cursor()
+                query = f"""UPDATE {self.db_conn.get_data_base_name()}.inversor
+                             SET cuil=%s, nombre=%s, apellido=%s, email=%s,  saldo_pesos=%s, perfil_inversor_id=%s 
+                             WHERE ID_Usuario=%s"""
+                cursor.execute(query, (usuario.cuil,usuario.nombre, usuario.apellido, usuario.email,  
+                                       usuario.saldo_pesos, usuario.perfil_inversor_id, usuario.id_inversor))
+                conn.commit()  # Confirma los cambios
+            except mysql.connector.Error as err:
+                raise err
 
-    def eliminar_usuario(self, id_usuario: int):
-        try:
-            conexion = self.db.conectar()
-            cursor = conexion.cursor()
-            cursor.execute("DELETE FROM Usuario WHERE ID_Usuario = %s", (id_usuario,))
-            conexion.commit()
-        finally:
-            self.db.cerrar_conexion()
+    def eliminar_usuario(self, id_inversor: int):
+        conn = self.db_conn.connect_to_mysql()  # Obtiene la conexión
+        with conn:  # Usa la conexión en un contexto
+            try:
+                cursor = conn.cursor()
+                query = f"DELETE FROM {self.db_conn.get_data_base_name()}.inversor WHERE id_inversor=%s"
+                cursor.execute(query, (id_inversor,))
+                conn.commit()  # Confirma los cambios
+            except mysql.connector.Error as err:
+                raise err
+
+    def obtener_por_id(self, id_inversor: int) -> User:
+        conn = self.db_conn.connect_to_mysql()  # Obtiene la conexión
+        with conn:  # Usa la conexión en un contexto
+            try:
+                cursor = conn.cursor()
+                query = f"SELECT id_inversor, cuil, nombre, apellido, email, contraseña, saldo_pesos, perfil_inversor_id FROM {self.db_conn.get_data_base_name()}.inversor WHERE id_inversor = %s"
+                cursor.execute(query, (id_inversor,))
+                resultado = cursor.fetchone()
+                if resultado:
+                    return User(*resultado)  # Crea un objeto User
+                return None  # Retorna None si no se encontró
+            except mysql.connector.Error as err:
+                raise err
