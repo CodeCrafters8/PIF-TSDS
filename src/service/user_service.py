@@ -2,7 +2,7 @@ import re
 from database.data_base_conection import DBConn
 from DAO.user_dao_imp import UserDAOImpl
 from DAO.perfil_Inversor_dao_imp import PerfilInversorDAOImpl
-from model.user import User  # Asegúrate de importar la clase User
+from model.user import User
 
 class UserService:
     def __init__(self, db_conn: DBConn):
@@ -37,7 +37,7 @@ class UserService:
         usuario = self.user_dao.obtener_usuario_por_email(email)
         if usuario and usuario.contraseña == contraseña:  # Comparación de contraseñas
             print("Inicio de sesión exitoso.")
-            return usuario
+            return usuario.id_inversor  # Devuelve el ID del inversor
         else:
             print("Email o contraseña incorrectos.")
             return None
@@ -50,6 +50,9 @@ class UserService:
             print("Contraseña actualizada exitosamente.")
         else:
             print("Error: Usuario no encontrado.")
+            
+    def obtener_informacion_inversores(self, id_inversor):
+        return self.user_dao.obtener_informacion_inversores(id_inversor)  # Pasa el id_inversor aquí
 
     @staticmethod
     def validar_email(email):
@@ -76,4 +79,4 @@ if __name__ == "__main__":
     connection = db_conn.connect_to_mysql()  
 
     # Pasar la conexión al UserService
-    service = UserService(db_conn)  
+    service = UserService(db_conn)

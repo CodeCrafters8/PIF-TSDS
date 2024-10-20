@@ -110,3 +110,31 @@ class UserDAOImpl(UserDAO):
                 return None  # Retorna None si no se encontró
             except mysql.connector.Error as err:
                 raise err
+            
+    def obtener_informacion_inversores(self, id_inversor):
+        conn = self.db_conn.connect_to_mysql()
+        with conn:
+            cursor = conn.cursor()
+            query = """
+            SELECT 
+                i.nombre,
+                i.apellido,
+                i.email,
+                pi.tipo_inversor,
+                COALESCE(SUM(p.total_invertido), 0) AS total_invertido,
+                i.saldo_pesos
+            FROM 
+                inversor i
+            JOIN 
+                perfil_inversor pi ON i.perfil_inversor_id = pi.id_perfil_inversor
+            LEFT JOIN 
+                portafolio p ON i.id_inversor = p.id_inversor
+            WHERE 
+                i.id_inversor = %s
+            GROUP BY 
+                i.id_inversor;
+            """
+            cursor.execute(query, (id_inversor,))
+            resultados = cursor.fetchall()
+            return resultados
+             
