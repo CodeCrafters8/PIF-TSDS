@@ -1,10 +1,20 @@
 from service.user_service import UserService
 from database.data_base_conection import DBConn
-
+import bcrypt 
 import colorama
 from colorama import Fore, Style
 
 colorama.init(autoreset=True)  # Inicializa colorama para usar colores automáticamente
+def encriptar_contraseña(contraseña):
+    # Genera un salt y encripta la contraseña
+    salt = bcrypt.gensalt()
+    contraseña_encriptada = bcrypt.hashpw(contraseña.encode('utf-8'), salt)
+    return contraseña_encriptada
+
+def verificar_contraseña(contraseña, contraseña_encriptada):
+    # Verifica si la contraseña ingresada coincide con la encriptada
+    return bcrypt.checkpw(contraseña.encode('utf-8'), contraseña_encriptada)
+
 
 def mostrar_menu():
     print(Fore.CYAN + Style.BRIGHT + "===========================")
@@ -25,6 +35,7 @@ def submenu_registro(service):
     apellido = input(Fore.WHITE + "Ingrese su apellido: ")
     email = input(Fore.WHITE + "Ingrese su email: ")
     contraseña = input(Fore.WHITE + "Ingrese su contraseña: ")
+    contraseña_encriptada = encriptar_contraseña(contraseña)
     saldo_pesos = 1000000.00  # Saldo inicial predeterminado
     tipo_inversor = input(Fore.WHITE + "Ingrese tipo de perfil (conservador, moderado, agresivo): ")
 
