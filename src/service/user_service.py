@@ -47,9 +47,9 @@ class UserService:
         if usuario:
             nueva_contraseña = input("Ingrese su nueva contraseña: ")
             self.user_dao.actualizar_contraseña(usuario.id_inversor, nueva_contraseña)
-            print("Contraseña actualizada exitosamente.")
+            return True  # Retorna True si se actualizó la contraseña
         else:
-            print("Error: Usuario no encontrado.")
+            return False 
             
     def obtener_informacion_inversores(self, id_inversor):
         return self.user_dao.obtener_informacion_inversores(id_inversor)  # Pasa el id_inversor aquí
