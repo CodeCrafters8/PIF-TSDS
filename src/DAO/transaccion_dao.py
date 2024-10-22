@@ -1,23 +1,24 @@
 from abc import ABC, abstractmethod
+from model.transaccion import Transaccion
 
-class transaccion_dao(ABC):
+class TransaccionDAO(ABC):
     @abstractmethod
-    def get(self, id: int):
+    def consultar(self, id: int):
         pass
     
     @abstractmethod
-    def get_by_inversor(self, inversor_id: int):
+    def consultar_por_inversor(self, inversor_id: int):
         pass
     
     @abstractmethod
-    def create (self, transaccion):
+    def crear (self, transaccion):
         pass
     
     @abstractmethod
-    def update(self, transaccion):
+    def actualizar(self, transaccion):
         pass
     
     @abstractmethod
-    def delete( self, id: int):
+    def eliminar( self, id: int):
         pass
     
