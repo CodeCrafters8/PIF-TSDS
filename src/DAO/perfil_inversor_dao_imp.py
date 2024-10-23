@@ -1,7 +1,7 @@
 import mysql.connector
 from DAO.perfil_Inversor_dao import PerfilInversorDAO
 from database.data_base_conection import DBConn
-from model.perfil_Inversor import PerfilInversor
+from model.perfil_inversor import PerfilInversor
 
 
 class PerfilInversorDAOImpl(PerfilInversorDAO):
