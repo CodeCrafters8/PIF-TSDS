@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from model.perfil_inversor import PerfilInversor
+from model.perfil_Inversor import PerfilInversor
 
 
 class PerfilInversorDAO(ABC):
