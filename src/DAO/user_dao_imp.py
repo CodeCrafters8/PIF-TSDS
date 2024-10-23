@@ -137,4 +137,41 @@ class UserDAOImpl(UserDAO):
             cursor.execute(query, (id_inversor,))
             resultados = cursor.fetchall()
             return resultados
-             
+        
+    def existe_usuario(self, email):
+        conn = self.db_conn.connect_to_mysql()  # Conectar a la base de datos
+        query = "SELECT COUNT(*) FROM inversor WHERE Email = %s"
+        cursor = conn.cursor()
+        
+        try:
+            cursor.execute(query, (email,))
+            resultado = cursor.fetchone()  # Obtener el resultado de la consulta
+            return resultado[0] > 0  # Retorna True si el usuario existe
+        finally:
+            cursor.close()  # Cerrar el cursor
+
+
+    def actualizar_saldo(self, user, total_costo):
+        conn = self.db_conn.connect_to_mysql()  # Conectar a la base de datos
+        try:
+            # Conectar y abrir cursor
+            cursor = conn.cursor()
+            # Actualizar saldo del usuario
+            nuevo_saldo = user.saldo_pesos - total_costo
+            query = """
+                UPDATE inversor SET saldo_pesos = %s WHERE id_inversor = %s
+            """
+            cursor.execute(query, (nuevo_saldo, user.id_inversor))
+            
+            # Confirmar cambios
+            conn.commit()
+            print("Saldo actualizado correctamente en la tabla usuario.")
+            
+            # Actualizar saldo en la instancia del usuario
+            user.saldo_pesos = nuevo_saldo       
+        except Exception as e:
+            print(f"Error al actualizar el saldo: {e}")
+            conn.rollback()    
+        finally:
+            if cursor:
+                cursor.close()             
