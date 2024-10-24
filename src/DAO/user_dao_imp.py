@@ -151,13 +151,28 @@ class UserDAOImpl(UserDAO):
             cursor.close()  # Cerrar el cursor
 
 
-    def actualizar_saldo(self, user, total_costo):
+    def actualizar_saldo(self, user: User, total: float, id_operacion: int):
+        """
+        Actualiza el saldo del usuario según el tipo de operación.
+        
+        Parámetros:
+            user (User): El usuario cuyo saldo necesita ser actualizado.
+            total (float): La cantidad por la que se ajustará el saldo.
+            id_operacion (int): El identificador de la operación (1 para venta, 2 para compra).
+        """
         conn = self.db_conn.connect_to_mysql()  # Conectar a la base de datos
         try:
-            # Conectar y abrir cursor
             cursor = conn.cursor()
-            # Actualizar saldo del usuario
-            nuevo_saldo = user.saldo_pesos - total_costo
+            
+            # Determinar si debemos restar o sumar al saldo según id_operacion
+            if id_operacion == 2:  # Compra
+                nuevo_saldo = user.saldo_pesos - total
+            elif id_operacion == 1:  # Venta
+                nuevo_saldo = user.saldo_pesos + total
+            else:
+                raise ValueError("id_operacion no válido. Debe ser 1 (venta) o 2 (compra).")
+            
+            # Actualizar el saldo del usuario en la base de datos
             query = """
                 UPDATE inversor SET saldo_pesos = %s WHERE id_inversor = %s
             """
@@ -167,11 +182,16 @@ class UserDAOImpl(UserDAO):
             conn.commit()
             print("Saldo actualizado correctamente en la tabla usuario.")
             
-            # Actualizar saldo en la instancia del usuario
-            user.saldo_pesos = nuevo_saldo       
+            # Actualizar el saldo en la instancia del usuario
+            user.saldo_pesos = nuevo_saldo
         except Exception as e:
             print(f"Error al actualizar el saldo: {e}")
-            conn.rollback()    
+            conn.rollback()
         finally:
             if cursor:
+<<<<<<< HEAD
                 cursor.close()             
+=======
+                cursor.close()
+            
+>>>>>>> christian
