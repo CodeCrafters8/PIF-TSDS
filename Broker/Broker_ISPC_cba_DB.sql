@@ -14,7 +14,10 @@ CREATE TABLE IF NOT EXISTS inversor (
     apellido VARCHAR(100) NOT NULL,
     email VARCHAR(320) NOT NULL UNIQUE,
     contraseña VARCHAR(255) NOT NULL,
+<<<<<<< HEAD
     saldo_pesos DECIMAL (10,2) NOT NULL,
+=======
+>>>>>>> d7e62caf4d8ef66611790bf1cdc62f9ca90e05d4
     perfil_inversor_id INT,  
     PRIMARY KEY (id_inversor),
     CONSTRAINT fk_perfil_inversor FOREIGN KEY (perfil_inversor_id) 
@@ -57,7 +60,12 @@ CREATE TABLE IF NOT EXISTS acciones (
 
 CREATE TABLE IF NOT EXISTS cotizacion (
     id_cotizacion INT AUTO_INCREMENT,
+<<<<<<< HEAD
     fecha DATETIME NOT NULL,
+=======
+    fecha DATE NOT NULL,
+    hora TIME NOT NULL,
+>>>>>>> d7e62caf4d8ef66611790bf1cdc62f9ca90e05d4
     accion_id INT,
     precio_apertura DECIMAL(10, 2) NOT NULL CHECK (precio_apertura >= 0),
     minimo_diario DECIMAL(10, 2) NOT NULL CHECK (minimo_diario >= 0),
@@ -74,20 +82,29 @@ CREATE TABLE IF NOT EXISTS cotizacion (
 
 CREATE TABLE IF NOT EXISTS operacion (
     id_operacion INT AUTO_INCREMENT,
+<<<<<<< HEAD
     fecha DATETIME NOT NULL,
+=======
+    fecha DATE NOT NULL,
+    hora TIME NOT NULL,
+>>>>>>> d7e62caf4d8ef66611790bf1cdc62f9ca90e05d4
     precio_operado DECIMAL(10, 2) NOT NULL CHECK (precio_operado > 0), 
     cantidad_operada INT NOT NULL CHECK (cantidad_operada > 0),
     cotizacion_id INT,
     tipo_operacion_id INT,
     inversor_id INT, 
+<<<<<<< HEAD
     comision INT,
     id_accion INT,  -- Añadir el campo id_accion
+=======
+>>>>>>> d7e62caf4d8ef66611790bf1cdc62f9ca90e05d4
     PRIMARY KEY (id_operacion),
     CONSTRAINT fk_cotizacion_operacion FOREIGN KEY (cotizacion_id)
         REFERENCES cotizacion(id_cotizacion) ON DELETE CASCADE,
     CONSTRAINT fk_tipo_operacion_operacion FOREIGN KEY (tipo_operacion_id)
         REFERENCES tipo_operacion(id_tipo_operacion) ON DELETE CASCADE,
     CONSTRAINT fk_inversor_operacion FOREIGN KEY (inversor_id)
+<<<<<<< HEAD
         REFERENCES inversor(id_inversor) ON DELETE CASCADE,
     CONSTRAINT fk_accion_operacion FOREIGN KEY (id_accion)
         REFERENCES acciones(id_accion) ON DELETE CASCADE  
@@ -96,6 +113,14 @@ CREATE TABLE IF NOT EXISTS operacion (
 
 CREATE TABLE IF NOT EXISTS portafolio (
     id_portafolio INT AUTO_INCREMENT,
+=======
+        REFERENCES inversor(id_inversor) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS portafolio (
+    id_portafolio INT AUTO_INCREMENT,
+    saldo_cuenta DECIMAL(10, 2) NOT NULL,
+>>>>>>> d7e62caf4d8ef66611790bf1cdc62f9ca90e05d4
     total_invertido DECIMAL (10,2) NOT NULL,
     id_inversor INT NOT NULL,
     PRIMARY KEY (id_portafolio),
@@ -114,3 +139,20 @@ CREATE TABLE IF NOT EXISTS portafolio_acciones (
     CONSTRAINT fk_accion_portafolio FOREIGN KEY (accion_id)
         REFERENCES acciones(id_accion) ON DELETE CASCADE
 );
+<<<<<<< HEAD
+=======
+
+CREATE TABLE IF NOT EXISTS historial_operaciones (
+    id_historial INT AUTO_INCREMENT,
+    operacion_id INT NOT NULL,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    precio_operado DECIMAL(10, 2) NOT NULL CHECK (precio_operado > 0),
+    cantidad_operada INT NOT NULL CHECK (cantidad_operada > 0),
+    tipo_operacion_id INT NOT NULL,
+    PRIMARY KEY (id_historial),
+    CONSTRAINT fk_historial_operacion FOREIGN KEY (operacion_id)
+        REFERENCES operacion(id_operacion) ON DELETE CASCADE,
+    CONSTRAINT fk_historial_tipo_operacion FOREIGN KEY (tipo_operacion_id)
+        REFERENCES tipo_operacion(id_tipo_operacion) ON DELETE CASCADE
+);
+>>>>>>> d7e62caf4d8ef66611790bf1cdc62f9ca90e05d4
