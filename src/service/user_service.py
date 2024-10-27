@@ -71,14 +71,3 @@ class UserService:
         import random
         import string
         return ''.join(random.choices(string.ascii_letters + string.digits, k=8))
-
-# Ejemplo de uso de la clase UserService
-# if __name__ == "__main__":
-#     # Crear una instancia de DBConn
-#     db_conn = DBConn()  # Asegúrate de que DBConn tenga un método para crear la conexión
-
-#     # Crear la conexión a la base de datos
-#     connection = db_conn.connect_to_mysql()  
-
-#     # Pasar la conexión al UserService
-#     service = UserService(db_conn)

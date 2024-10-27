@@ -188,6 +188,7 @@ class UserDAOImpl(UserDAO):
             print(f"Error al actualizar el saldo: {e}")
             conn.rollback()
         finally:
+            
             if cursor:          
                 cursor.close()
             
