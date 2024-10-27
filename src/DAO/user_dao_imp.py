@@ -26,11 +26,19 @@ class UserDAOImpl(UserDAO):
         with conn:  # Usa la conexión en un contexto
             try:
                 cursor = conn.cursor()
-                query = f"""INSERT INTO {self.db_conn.get_data_base_name()}.inversor
+                query_inversor = f"""INSERT INTO {self.db_conn.get_data_base_name()}.inversor
                             (cuil, nombre, apellido, email, contraseña, saldo_pesos, perfil_inversor_id) 
                             VALUES (%s, %s, %s, %s, %s, %s, %s)"""
-                cursor.execute(query, (usuario.cuil, usuario.nombre, usuario.apellido, usuario.email, usuario.contraseña,
+                cursor.execute(query_inversor, (usuario.cuil, usuario.nombre, usuario.apellido, usuario.email, usuario.contraseña,
                                         usuario.saldo_pesos, usuario.perfil_inversor_id))
+                
+                id_inversor = cursor.lastrowid
+                
+                query_portafolio  = f""" INSERT INTO {self.db_conn.get_data_base_name()}.portafolio (total_invertido, id_inversor)
+                             VALUES (%s, %s)"""
+                
+                cursor.execute(query_portafolio, (0.0, id_inversor))
+                
                 conn.commit()  # Confirma los cambios
             except mysql.connector.Error as err:
                 raise err
