@@ -6,6 +6,8 @@ from DAO.cotizacion_dao_imp import CotizacionDAOImp
 from service.transaccion_service import TransaccionService
 from model.portafolio import Portafolio
 from database.data_base_conection import DBConn
+from rich.console import Console
+from rich.table import Table
 
 class PortafolioService:
     def __init__(self, db_conn, portafolio_dao, cotizacion_dao, user_dao, transaccion_service):
@@ -56,51 +58,71 @@ class PortafolioService:
 
         # Retorna el rendimiento calculado
         return rendimiento
-
+    
     def mostrar_portafolio(self, id_inversor):
         portafolio = self.portafolio_dao.obtener_portafolio_por_id_inversor(id_inversor)
+        console = Console()  # Inicializa el objeto Console para imprimir en la consola
+        
         if not portafolio:
-            print("No se encontró el portafolio para el inversor especificado.")
+            console.print("No se encontró el portafolio para el inversor especificado.", style="bold red")
             return
-
+        
         acciones = portafolio.acciones
         saldo = self.obtener_saldo_usuario(id_inversor)
         total_invertido = 0
-
-        print(f"Saldo actual: {saldo:.2f}")
-        print("| ID | Ticker | Empresa | Cantidad Total | Precio Promedio Compra | Precio Compra | Precio Venta | Rendimiento |")
-
+        
+        console.print(f"Saldo actual: [bold green]{saldo:.2f}[/bold green]")
+        
+        # Crear la tabla
+        table = Table(title="Portafolio del Inversor")
+        
+        table.add_column("ID", style="cyan", justify="right")
+        table.add_column("Ticker", style="magenta")
+        table.add_column("Empresa", style="yellow")
+        table.add_column("Cantidad Total", style="green", justify="right")
+        table.add_column("Precio Promedio Compra", style="blue", justify="right")
+        table.add_column("Precio Actual", style="blue", justify="right")
+        table.add_column("Rendimiento", style="red", justify="right")
+        
         for accion_con_tenencia in acciones:
             accion = accion_con_tenencia.accion  # Obtén el objeto Accion
             cantidad_tenencia = accion_con_tenencia.cantidad_tenencia  # Obtén la cantidad en tenencia
-
+            
             # Obtener las transacciones para el inversor y la acción
             transacciones = self.transaccion_service.obtener_transacciones_por_accion_y_inversor(id_inversor, accion.id_accion)
-
+            
             # Calcular la sumatoria de precio_operado * cantidad_operada y la cantidad total
-            suma_precio_operado = sum(transacciones.precio_operado * transacciones.cantidad_operada for transacciones in transacciones)
-            suma_cantidad_operada = sum(transacciones.cantidad_operada for transacciones in transacciones)
+            suma_precio_operado = sum(t.precio_operado * t.cantidad_operada for t in transacciones)
+            suma_cantidad_operada = sum(t.cantidad_operada for t in transacciones)
 
             # Calcular el precio promedio de compra
-            if suma_cantidad_operada > 0:
-                precio_promedio_compra = suma_precio_operado / suma_cantidad_operada
-            else:
-                precio_promedio_compra = 0
+            precio_promedio_compra = suma_precio_operado / suma_cantidad_operada if suma_cantidad_operada > 0 else 0
 
             # Obtener el precio actual usando el método existente
             precio_actual = self.cotizacion_dao.obtener_precio_reciente_compra(accion.id_accion)
             precio_venta = self.cotizacion_dao.obtener_precio_reciente_venta(accion.id_accion)
+            
+            
             # Calcular rendimiento
             rendimiento = (precio_actual - precio_promedio_compra) * cantidad_tenencia if cantidad_tenencia > 0 else 0
 
-            # Imprime la información de la acción
-            print(f"{accion.id_accion} | {accion.ticker} | {accion.nombre} | {cantidad_tenencia} | {precio_promedio_compra:.2f} | {precio_actual:.2f} | {rendimiento:.2f}")
-
-            total_invertido += suma_precio_operado  # Actualiza el total invertido
-
-        print(f"Total invertido: {total_invertido:.2f}")
-
-
+            # Agregar una fila a la tabla
+            table.add_row(
+                str(accion.id_accion),
+                accion.ticker,
+                accion.nombre,
+                str(cantidad_tenencia),
+                f"{precio_promedio_compra:.2f}",
+                f"{precio_actual:.2f}",
+                f"{rendimiento:.2f}"
+                )
+            total_invertido += suma_precio_operado 
+            
+        console.print(table)
+        console.print(f"Total invertido: [bold blue]{total_invertido:.2f}[/bold blue]")
+    
+    
+    
     def vender_acciones(self, id_inversor, ticker, cantidad, precio_venta):
         acciones = self.portafolio_dao.obtener_acciones_por_usuario(id_inversor)
         

@@ -36,7 +36,7 @@ class UserService:
     def iniciar_sesion(self, email, contraseña):
         usuario = self.user_dao.obtener_usuario_por_email(email)
         if usuario and usuario.contraseña == contraseña:  # Comparación de contraseñas
-            print("Inicio de sesión exitoso.")
+            #print("Inicio de sesión exitoso.")
             return usuario.id_inversor  # Devuelve el ID del inversor
         else:
             print("Email o contraseña incorrectos.")
