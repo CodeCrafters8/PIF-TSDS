@@ -71,7 +71,7 @@ def submenu_iniciar_sesion(service, portafolio_service, transaccion_service, acc
 
         while True:
             console.print(Panel("[yellow bold]Opciones del Inversor[/]", style="cyan"))
-            console.print("[green]1.[/] Consultar saldo\n[green]2.[/] Portafolio\n[green]3.[/] Realizar inversión\n[green]4.[/] Cerrar sesión")
+            console.print("[green]1.[/] Consultar saldo\n[green]2.[/] Portafolio\n[green]3.[/] Realizar operación\n[green]4.[/] Cerrar sesión")
             opcion = Prompt.ask("Seleccione una opción", default="")
 
             if opcion == "1":

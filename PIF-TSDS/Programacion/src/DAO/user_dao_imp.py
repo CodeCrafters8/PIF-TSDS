@@ -166,19 +166,19 @@ class UserDAOImpl(UserDAO):
         Parámetros:
             user (User): El usuario cuyo saldo necesita ser actualizado.
             total (float): La cantidad por la que se ajustará el saldo.
-            id_operacion (int): El identificador de la operación (1 para venta, 2 para compra).
+            id_operacion (int): El identificador de la operación (1 para compra, 2 para venta).
         """
         conn = self.db_conn.connect_to_mysql()  # Conectar a la base de datos
         try:
             cursor = conn.cursor()
             
             # Determinar si debemos restar o sumar al saldo según id_operacion
-            if id_operacion == 2:  # Compra
-                nuevo_saldo = user.saldo_pesos - total
-            elif id_operacion == 1:  # Venta
+            if id_operacion == 2:  # Venta
                 nuevo_saldo = user.saldo_pesos + total
+            elif id_operacion == 1:  # Compra
+                nuevo_saldo = user.saldo_pesos - total
             else:
-                raise ValueError("id_operacion no válido. Debe ser 1 (venta) o 2 (compra).")
+                raise ValueError("id_operacion no válido. Debe ser 1 (compra) o 2 (venta).")
             
             # Actualizar el saldo del usuario en la base de datos
             query = """
