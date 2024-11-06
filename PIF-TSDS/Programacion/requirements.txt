@@ -1,0 +1,17 @@
+# Requerimientos del proyecto
+
+# Conector para MySQL
+mysql-connector-python==9.0.0
+
+# Para el manejo de contraseñas
+bcrypt==4.2.0
+
+# Herramienta para pruebas
+pytest==8.3.3
+
+# Para leer archivos de configuración
+configparser==7.1.0
+
+# Otras bibliotecas que puedas necesitar
+colorama==0.4.6
+rish
